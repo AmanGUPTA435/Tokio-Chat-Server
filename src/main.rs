@@ -1,50 +1,4 @@
-// use tokio::{io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader}, net::TcpListener, sync::broadcast};
-
-use std::borrow::BorrowMut;
-
 use tokio::{io::AsyncBufReadExt, spawn, sync::broadcast};
-// #[tokio::main]
-// async fn main() {
-//     let listener = TcpListener::bind("localhost:8180").await.unwrap();
-//     let (tx, mut _rx) = broadcast::channel(10);
-//     loop {
-//         let (mut socket, addr) = listener.accept().await.unwrap();
-//         let tx = tx.clone(); 
-//         let mut rx = tx.subscribe();   
-//         tokio::spawn(async move {
-//             let (reader, mut writer) = socket.split();
-//             let mut reader = BufReader::new(reader);
-//             let mut line = String::new();
-//             loop{
-//                 tokio::select! {
-//                     result = reader.read_line(&mut line) => {
-//                         if result.unwrap() == 0{
-//                             break;
-//                         }
-//                         tx.send((line.clone(), addr)).unwrap();
-//                         line.clear();
-//                     }
-//                     result = rx.recv() => {
-//                         let (msg, other_addr) = result.unwrap();
-//                         if addr != other_addr {
-//                             writer.write_all(msg.as_bytes()).await.unwrap();
-//                         } 
-//                     }
-//                 }
-//                 // let bytes_read = reader.read_line(&mut line).await.unwrap();
-//                 // if bytes_read == 0{
-//                 //     break;
-//                 // }
-//                 // let msg = rx.recv().await.unwrap();
-//                 // writer.write_all(msg.as_bytes()).await.unwrap();
-//                 // tx.send(line.clone()).unwrap();
-//                 // line.clear();
-//             }
-//         });
-//     }
-// }
-// #[cfg_attr(forbid(unused_imports), )]
-// #[expect(unused_attributes)]
 use tokio::{io::{AsyncWriteExt, BufReader}, net::TcpListener};
 
 #[tokio::main]
@@ -71,10 +25,7 @@ async fn main() {
                         if let Err(err) = tx.send((to_write.clone(), addr)) {
                             eprintln!("Broadcast Error: {}", err);
                         }
-                        // if let Err(err) = writer.write_all(to_write.as_bytes()).await {
-                        //     eprintln!("Failed to write to client: {}", err);
-                        //     break;
-                        // }
+                        
                         to_write.clear();
                     }
 
@@ -95,22 +46,8 @@ async fn main() {
                         }
                     }
                 }
-            }
-            // std::io::stdin().read_line(&mut to_write).expect("Failed to read input");
-            // let write = writer.write(to_write.as_bytes()).await;
-            // let read = reader.try_read(&mut data);
-            // tx.send(to_write.clone()).unwrap();
-            // if write.ok() != read.ok() {
-            //     println!("works");
-            //     // break;
-            // }
-            // println!("{:?}",rx.recv().await);
-            
-            
-        });
-        // handle.await.unwrap();
-        // let buffer:BufReader<tokio::net::TcpStream> = BufReader::new(&socket);
+            }            
+        });        
     }
-    // socket.write().await;
-    // Ok(())
+    
 }
