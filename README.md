@@ -24,7 +24,7 @@ This is a simple multi-client chat server implemented in Rust using the Tokio as
 git clone https://github.com/AmanGUPTA435/Tokio-Chat-Server.git
 
 # Navigate to the project directory
-cd chat-stream-tokio
+cd tokio-chat-server
 ```
 
 ### Running the Server
