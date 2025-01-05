@@ -123,7 +123,3 @@ cd tokio-chat-server
 ## Contributing
 
 Feel free to fork this repository and submit pull requests for new features or bug fixes.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
