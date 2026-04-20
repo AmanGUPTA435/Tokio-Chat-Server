@@ -195,39 +195,35 @@ cargo run --bin client -- join bob 1
 
 ## ⚠️ Limitations
 
-Uses a simple text-based protocol (not JSON/protobuf)
-No authentication or access control
-In-memory group broadcast (not distributed)
+- Uses a simple text-based protocol (not JSON/protobuf)
+- No authentication or access control
+- In-memory group broadcast (not distributed)
 
 ## 🔮 Future Improvements
 
-Structured protocol using serde (JSON)
-WebSocket support for browser clients
-Redis-backed pub/sub for scaling
-Authentication and private groups
-Message pagination and history APIs
+- Structured protocol using serde (JSON)
+- WebSocket support for browser clients
+- Redis-backed pub/sub for scaling
+- Authentication and private groups
+- Message pagination and history APIs
 
 ## 💡 Why This Project Stands Out
 
 This project demonstrates:
 
-Real-world async Rust patterns
-Understanding of concurrent systems
-Clean separation of client/server responsibilities
-Database-backed state management
-Practical networking beyond simple examples
+- Real-world async Rust patterns
+- Understanding of concurrent systems
+- Clean separation of client/server responsibilities
+- Database-backed state management
+- Practical networking beyond simple examples
 
 ## 🏁 Summary
 
 A production-style foundation for a chat system, showcasing how to combine:
 
-async Rust
-networking
-database systems
-concurrency primitives
+- async Rust
+- networking
+- database systems
+- concurrency primitives
 
 into a cohesive backend service.
-
-```
-
-```
