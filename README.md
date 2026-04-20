@@ -175,15 +175,21 @@ After joining, the connection becomes a real-time message stream.
 
 # Terminal 1
 
+```bash
 cargo run --bin server
+```
 
 # Terminal 2
 
+```bash
 cargo run --bin client -- join alice 1
+```
 
 # Terminal 3
 
+```bash
 cargo run --bin client -- join bob 1
+```
 
 👉 Real-time chat begins immediately.
 
