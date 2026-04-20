@@ -1,125 +1,227 @@
-# Chat Server
+# 🔥 Async Chat Server (Rust + Tokio + PostgreSQL)
 
-This is a simple multi-client chat server implemented in Rust using the Tokio asynchronous runtime. Clients can connect to the server, set a username, and send messages to each other in real-time. The server broadcasts join, leave, and message events to all connected clients.
+A **multi-client, real-time chat system** built in Rust using Tokio, designed to demonstrate **async concurrency, protocol design, and backend system architecture**.
 
-## Features
+---
 
-- Multiple clients can connect to the server simultaneously.
-- Clients are prompted to enter a username when they connect.
-- Messages sent by one client are broadcast to all other connected clients.
-- Notifications are sent when a user joins or leaves the chat.
-- Fully asynchronous implementation using Tokio.
+## 🚀 Overview
 
-## Prerequisites
+This project implements a **stateful chat server** where multiple clients can:
 
-- [Rust](https://www.rust-lang.org/tools/install) installed on your system.
-- Basic understanding of Rust and Tokio library.
+- Register with a username
+- Join chat groups
+- Exchange messages in real-time
+- Receive join/leave notifications
 
-## Getting Started
+### ✨ Key Features
 
-### Cloning the Repository
+- Concurrent connection handling
+- Event broadcasting
+- Database-backed persistence
+- Command-based client-server protocol
 
-```bash
-# Clone this repository
-git clone https://github.com/AmanGUPTA435/Tokio-Chat-Server.git
+---
 
-# Navigate to the project directory
-cd tokio-chat-server
+## 🧠 Key Concepts Demonstrated
+
+- Asynchronous Rust (Tokio runtime)
+- Concurrent system design
+- TCP-based protocol handling
+- Database integration with SQLx
+- Event-driven architecture
+- State management across clients
+
+---
+
+## 🏗️ Architecture
+
+```text
+CLI Client
+    ↓ TCP
+Server (Tokio)
+    ↓
+PostgreSQL
 ```
 
-### Running the Server
+## ⚙️ Components
 
-1. Compile and run the server using Cargo:
+### Client
 
-   ```bash
-   cargo run
-   ```
+- CLI-based interface using `clap`
+- Sends structured commands (`register`, `join`)
+- Maintains persistent connection for chat
 
-2. The server will start listening on `localhost:8081`.
+### Server
 
-### Connecting to the Server
+- Handles multiple clients concurrently (`tokio::spawn`)
+- Dispatches commands (`register`, `join`)
+- Broadcasts events using `tokio::sync::broadcast`
+- Maintains group-based chat state
 
-1. Use a TCP client like `telnet` or `nc` (netcat) to connect to the server.
+### Database
 
-   Example with `telnet`:
+- Stores users, group membership, and messages
+- Accessed via SQLx with compile-time query validation
 
-   ```bash
-   telnet localhost 8081
-   ```
+---
 
-2. Enter your username when prompted.
+## ⚙️ Tech Stack
 
-3. Start sending messages, and you will see messages from other connected clients in real-time.
+- Rust
+- Tokio (async runtime)
+- SQLx (PostgreSQL with compile-time checks)
+- Clap (CLI parsing)
+- PostgreSQL
 
-## Code Overview
+---
 
-### Key Components
+## 🔄 System Flow
 
-- **`TcpListener`**: Listens for incoming client connections.
-- **`broadcast`**: Used for sharing messages between clients efficiently.
-- **`tokio::spawn`**: Creates a separate asynchronous task for each client.
-- **`tokio::select!`**: Concurrently handles incoming client messages and broadcast events.
+### 1. Registration
 
-### Functionality
+```text
+Client → register
+Client → username
+Server → inserts user into DB
+```
 
-1. **Client Connection**:
+### 2. Join Chat
 
-   - Clients are prompted to enter their username upon connection.
-   - A join message is broadcast to notify other clients.
+```text
+Client → join
+Client → username
+Client → group_id
+Server → validates user
+Server → registers membership
+Server → enters chat loop
+```
 
-2. **Message Handling**:
+### 3. Messaging
 
-   - Messages sent by a client are broadcast to all other connected clients.
+- Messages are:
+  - written to DB
+  - broadcast to all connected clients in the same group
 
-3. **Client Disconnection**:
-   - A leave message is broadcast when a client disconnects.
+---
 
-### Sample Interaction
+### 4. Disconnection
 
-1. Client 1 connects and enters the username "Alice":
+- When a client disconnects:
+  - a leave event is recorded
+  - broadcast sent to group
 
-   ```
-   Enter your username: Alice
-   Alice has joined the chat.
-   ```
+---
 
-2. Client 2 connects and enters the username "Bob":
+## 🧵 Concurrency Model
 
-   ```
-   Enter your username: Bob
-   Bob has joined the chat.
-   ```
+Each client runs in its own async task:
 
-3. Client 1 sends a message:
+```rust
+tokio::spawn(async move {
+    // handle connection
+});
+```
 
-   ```
-   Alice: Hello, everyone!
-   ```
+Message distribution uses:
 
-4. Client 2 receives the message:
+```rust
+tokio::sync::broadcast
+```
 
-   ```
-   Alice: Hello, everyone!
-   ```
+## ✅ Benefits
 
-5. Client 2 sends a reply:
+1.  Non-blocking communication
+2.  Scalable fan-out to multiple clients
 
-   ```
-   Bob: Hi Alice!
-   ```
+## 🗄️ Database Design
 
-6. Client 1 receives the reply:
+### Tables
 
-   ```
-   Bob: Hi Alice!
-   ```
+```text
+users → registered users
+group_members → active group membership
+group_requests → join/leave history
+group_chats → message storage
+```
 
-7. When a client disconnects, a leave message is broadcast:
+## 📡 Protocol Design
 
-   ```
-   Bob has left the chat.
-   ```
+The system uses a simple command-based TCP protocol:
 
-## Contributing
+```text
+Register
+register
+username
+Join
+join
+username
+group_id
+```
 
-Feel free to fork this repository and submit pull requests for new features or bug fixes.
+After joining, the connection becomes a real-time message stream.
+
+## 🚀 Running the Project
+
+1. Setup Database
+   createdb chat_server
+   export DATABASE_URL=postgres://postgres:password@localhost:5432/chat_server
+   cargo sqlx migrate run
+2. Run Server
+   cargo run --bin server
+3. Run Client
+   cargo run --bin client -- register <username>
+   cargo run --bin client -- join <username> <group_id>
+   🧪 Example
+
+# Terminal 1
+
+cargo run --bin server
+
+# Terminal 2
+
+cargo run --bin client -- join alice 1
+
+# Terminal 3
+
+cargo run --bin client -- join bob 1
+
+👉 Real-time chat begins immediately.
+
+## ⚠️ Limitations
+
+Uses a simple text-based protocol (not JSON/protobuf)
+No authentication or access control
+In-memory group broadcast (not distributed)
+
+## 🔮 Future Improvements
+
+Structured protocol using serde (JSON)
+WebSocket support for browser clients
+Redis-backed pub/sub for scaling
+Authentication and private groups
+Message pagination and history APIs
+
+## 💡 Why This Project Stands Out
+
+This project demonstrates:
+
+Real-world async Rust patterns
+Understanding of concurrent systems
+Clean separation of client/server responsibilities
+Database-backed state management
+Practical networking beyond simple examples
+
+## 🏁 Summary
+
+A production-style foundation for a chat system, showcasing how to combine:
+
+async Rust
+networking
+database systems
+concurrency primitives
+
+into a cohesive backend service.
+
+```
+
+```

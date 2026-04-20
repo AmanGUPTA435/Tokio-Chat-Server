@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO group_requests (user_name, group_id, request_type, status, created_at) VALUES ((SELECT id FROM users WHERE username = $1), $2, 'leave', 'complete', $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "04c5d28e4328b41cf5368a093e62a9a6bd1f211f895a389a917c9d0be1d3c9fb"
+}
