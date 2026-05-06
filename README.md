@@ -8,7 +8,8 @@ This project implements a **stateful TCP-based chat server** capable of handling
 
 Clients can:
 
-- Register with a username
+- Register and authenticate using credentials
+- Maintain session-based authentication (no repeated password usage)
 - Join chat groups
 - Exchange messages in real time
 - Receive join/leave events
@@ -76,27 +77,37 @@ Client → username
 Server → insert user into DB
 ```
 
-### 2. Join Group
+### 2. Login
+
+```
+Client → login
+Client → username + password
+Server → validate credentials
+Server → return SESSION <session_id>
+Client → store session_id locally
+```
+
+### 3. Join Group
 
 ```
 Client → join
-Client → username + group_id
-Server → validate user
+Client → session_id + group_id
+Server → validate session
 Server → register membership
 Server → enter chat loop
 ```
 
-### 3. Messaging
+### 4. Messaging
 
 - Messages are:
   - persisted to PostgreSQL
   - broadcast to all clients in the same group
 
-### 4. Disconnection
+### 5. Disconnection
 
-- Client disconnect triggers:
-  - membership update
-  - broadcast of leave event
+- Server detects TCP disconnect
+- Cleans up session/group state
+- Broadcasts leave event
 
 ## 🧵 Concurrency Model
 
@@ -120,6 +131,19 @@ tokio::sync::broadcast
 - Efficient fan-out to multiple clients
 - Minimal contention using concurrent data structures
 
+## 🔐 Session Management
+
+- Server issues a `session_id` upon successful login
+- Client persists session locally (file-based storage)
+- Subsequent requests use session_id instead of credentials
+- Enables stateless authentication across requests
+
+### Benefits:
+
+- Avoids repeated credential transmission
+- Simplifies request authentication
+- Closer to real-world backend systems (token/session-based auth)
+
 ## 🗄️ Data Model
 
 - users → registered users
@@ -129,18 +153,36 @@ tokio::sync::broadcast
 
 ## 📡 Protocol Design
 
-A simple command-based TCP protocol:
+A lightweight JSON-over-TCP protocol with command-based semantics:
 
 ```bash
 register
 <username>
+<password>
+
+login
+<username>
+<password>
 
 join
-<username>
+<session_id>
 <group_id>
 ```
 
 After joining, the connection transitions into a real-time message stream.
+
+## ⚠️ Failure Handling
+
+- Detects TCP disconnects and cleans up session state
+- Handles partial reads and broken connections gracefully
+- Prevents blocking via async I/O and task isolation
+- Logs and surfaces errors using structured tracing
+
+### Observed Failure Modes:
+
+- Client disconnect mid-message
+- Invalid session_id usage
+- Network write failures during broadcast
 
 ## ⚙️ Tech Stack
 
@@ -170,7 +212,8 @@ cargo run --bin server
 
 ```bash
 cargo run --bin client -- register alice
-cargo run --bin client -- join alice 1
+cargo run --bin client -- login alice
+cargo run --bin client -- join 1
 ```
 
 ## 🧪 Example
@@ -197,10 +240,30 @@ cargo run --bin client -- join bob 1
 
 ## ⚠️ Limitations
 
-- Text-based protocol (no structured encoding like JSON/protobuf)
+- Uses JSON over TCP (not a fully structured protocol like Protobuf/gRPC)
 - No authentication or authorization
 - In-memory broadcast (not horizontally scalable)
 - Single-node deployment
+
+## ⚖️ Concurrency Tradeoffs
+
+- Uses `tokio::sync::broadcast` for efficient fan-out
+  - Fast for in-memory delivery
+  - Drops messages if receivers lag behind
+
+- Each client handled via independent async task
+  - Improves isolation
+  - Increases scheduling overhead under high load
+
+- Shared state managed via concurrent data structures
+  - Minimizes locking contention
+  - Still bounded by single-node memory limits
+
+## 📉 Scalability Considerations
+
+- Broadcast channel is in-memory → not suitable for distributed systems
+- Single-node architecture limits horizontal scalability
+- Database writes may become bottleneck under high message throughput
 
 ## 🔮 Future Improvements
 
@@ -218,6 +281,7 @@ This project demonstrates:
 - Handling concurrency with async task scheduling
 - Designing stateful backend services
 - Managing real-time data flow and persistence
+- Understanding of tradeoffs in real-time systems (latency vs consistency vs scalability)
 
 ## 🏁 Summary
 
