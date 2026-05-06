@@ -2,8 +2,6 @@
 
 A **real-time, multi-client chat system** built in Rust using Tokio, designed to demonstrate **async concurrency, low-latency networking, and backend system design**.
 
----
-
 ## 🚀 Overview
 
 This project implements a **stateful TCP-based chat server** capable of handling multiple concurrent clients with non-blocking I/O.
@@ -15,8 +13,6 @@ Clients can:
 - Exchange messages in real time
 - Receive join/leave events
 
----
-
 ## ✨ Key Features
 
 - ⚡ Low-latency async networking using Tokio
@@ -24,8 +20,6 @@ Clients can:
 - 📡 Real-time message broadcasting
 - 🧠 Stateful session and group management
 - 🗄️ PostgreSQL-backed persistence (SQLx)
-
----
 
 ## 🧠 Core Concepts Demonstrated
 
@@ -36,10 +30,9 @@ Clients can:
 - Database-backed state management
 - Backpressure-safe message distribution
 
----
-
 ## 🏗️ Architecture
 
+```
 CLI Client
 │
 ▼
@@ -50,8 +43,7 @@ Async Server (Tokio)
 │
 ▼
 PostgreSQL (SQLx)
-
----
+```
 
 ## ⚙️ System Components
 
@@ -61,8 +53,6 @@ PostgreSQL (SQLx)
 - Sends structured commands (`register`, `join`)
 - Maintains persistent TCP connection for real-time messaging
 
----
-
 ### Server
 
 - Handles each client in an independent async task (`tokio::spawn`)
@@ -70,35 +60,31 @@ PostgreSQL (SQLx)
 - Maintains shared state across clients (groups, sessions)
 - Broadcasts messages using `tokio::sync::broadcast`
 
----
-
 ### Database
 
 - Stores users, group membership, and messages
 - Accessed via SQLx with compile-time query validation
 - Ensures transactional consistency for concurrent operations
 
----
-
 ## 🔄 System Flow
 
 ### 1. Registration
 
+```
 Client → register
 Client → username
 Server → insert user into DB
-
----
+```
 
 ### 2. Join Group
 
+```
 Client → join
 Client → username + group_id
 Server → validate user
 Server → register membership
 Server → enter chat loop
-
----
+```
 
 ### 3. Messaging
 
@@ -106,15 +92,11 @@ Server → enter chat loop
   - persisted to PostgreSQL
   - broadcast to all clients in the same group
 
----
-
 ### 4. Disconnection
 
 - Client disconnect triggers:
   - membership update
   - broadcast of leave event
-
----
 
 ## 🧵 Concurrency Model
 
@@ -128,39 +110,45 @@ tokio::spawn(async move {
 
 Message distribution uses:
 
+```rust
 tokio::sync::broadcast
-Properties:
-Non-blocking I/O
-Efficient fan-out to multiple clients
-Minimal contention using concurrent data structures
+```
+
+### Properties:
+
+- Non-blocking I/O
+- Efficient fan-out to multiple clients
+- Minimal contention using concurrent data structures
 
 ## 🗄️ Data Model
 
-users → registered users
-group_members → active memberships
-group_requests → join/leave history
-group_chats → message storage
+- users → registered users
+- group_members → active memberships
+- group_requests → join/leave history
+- group_chats → message storage
 
 ## 📡 Protocol Design
 
 A simple command-based TCP protocol:
 
+```bash
 register
 <username>
 
 join
 <username>
 <group_id>
+```
 
 After joining, the connection transitions into a real-time message stream.
 
 ## ⚙️ Tech Stack
 
-Rust
-Tokio (async runtime)
-SQLx (PostgreSQL with compile-time checks)
-PostgreSQL
-Clap (CLI interface)
+- Rust
+- Tokio (async runtime)
+- SQLx (PostgreSQL with compile-time checks)
+- PostgreSQL
+- Clap (CLI interface)
 
 ## 🚀 Running the Project
 
