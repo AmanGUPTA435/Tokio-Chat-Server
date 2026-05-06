@@ -1,3 +1,4 @@
 pub mod db;
-// pub mod server;
-// pub mod client;
+pub mod methods;
+mod server;
+mod client;

@@ -8,7 +8,6 @@ CREATE TABLE chat (
 CREATE INDEX idx_chat_user_name ON chat(user_name);
 
 CREATE TABLE group_requests (
-    id SERIAL PRIMARY KEY,
     user_name VARCHAR(255) NOT NULL,
     group_id INTEGER NOT NULL,
     request_type VARCHAR(10) NOT NULL CHECK (request_type IN ('join', 'leave')),
@@ -27,7 +26,6 @@ CREATE TABLE group_members (
 );
 
 CREATE TABLE group_chats (
-    id SERIAL PRIMARY KEY,
     group_id INTEGER NOT NULL,
     user_name VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
@@ -40,7 +38,7 @@ CREATE INDEX idx_group_chats_group_id ON group_chats(group_id);
 CREATE INDEX idx_group_chats_user_id ON group_chats(user_name);
 
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    password_hash TEXT NOT NULL
 );
