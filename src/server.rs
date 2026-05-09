@@ -469,9 +469,7 @@ mod tests {
         response
     }
 
-    // ----------------------------------------
-    // 🧪 REGISTER TESTS
-    // ----------------------------------------
+    // REGISTER TESTS
 
     #[tokio::test]
     async fn test_register_success() {
@@ -514,9 +512,7 @@ mod tests {
         assert!(res.contains("ERROR"));
     }
 
-    // ----------------------------------------
-    // 🧪 LOGIN TESTS
-    // ----------------------------------------
+    // LOGIN TESTS
 
     #[tokio::test]
     async fn test_login_success() {
@@ -568,9 +564,7 @@ mod tests {
         assert!(res.contains("ERROR"));
     }
 
-    // ----------------------------------------
-    // 🧪 SESSION TESTS
-    // ----------------------------------------
+    // SESSION TESTS
 
     #[tokio::test]
     async fn test_logout() {
@@ -605,9 +599,7 @@ mod tests {
         assert!(res.contains("Logged out"));
     }
 
-    // ----------------------------------------
-    // 🧪 JOIN TESTS
-    // ----------------------------------------
+    // JOIN TESTS
 
     #[tokio::test]
     async fn test_join_invalid_session() {
@@ -625,9 +617,7 @@ mod tests {
         assert!(res.contains("ERROR"));
     }
 
-    // ----------------------------------------
-    // 🧪 INVALID COMMAND
-    // ----------------------------------------
+    // INVALID COMMAND
 
     #[tokio::test]
     async fn test_invalid_json() {

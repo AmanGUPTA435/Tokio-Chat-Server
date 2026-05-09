@@ -197,10 +197,6 @@ mod tests {
     use std::fs;
     use chat_stream_tokio::methods::{Command, CliCommand};
 
-    // ----------------------------------------
-    // 🧪 HANDLE RESPONSE TESTS
-    // ----------------------------------------
-
     #[test]
     fn test_handle_server_response_success() {
         let res = handle_server_response("User registered\n");
@@ -220,10 +216,6 @@ mod tests {
         }
     }
 
-    // ----------------------------------------
-    // 🧪 COMMAND SERIALIZATION
-    // ----------------------------------------
-
     #[test]
     fn test_command_serialization() {
         let cmd = Command::Register {
@@ -236,10 +228,6 @@ mod tests {
         assert!(json.contains("Register"));
         assert!(json.contains("user"));
     }
-
-    // ----------------------------------------
-    // 🧪 CLI → COMMAND MAPPING
-    // ----------------------------------------
 
     #[test]
     fn test_cli_to_command_mapping_register() {
@@ -264,10 +252,6 @@ mod tests {
         }
     }
 
-    // ----------------------------------------
-    // 🧪 SESSION FILE TESTS
-    // ----------------------------------------
-
     #[test]
     fn test_session_file_write_and_read() {
         let file = ".test_session";
@@ -290,10 +274,6 @@ mod tests {
         assert!(res.is_err());
     }
 
-    // ----------------------------------------
-    // 🧪 LOGIN RESPONSE PARSING
-    // ----------------------------------------
-
     #[test]
     fn test_session_extraction() {
         let response = "SESSION abc123\n";
@@ -305,10 +285,6 @@ mod tests {
 
         assert_eq!(session_id, "abc123");
     }
-
-    // ----------------------------------------
-    // 🧪 ERROR PROPAGATION
-    // ----------------------------------------
 
     #[test]
     fn test_error_conversion_io() {
